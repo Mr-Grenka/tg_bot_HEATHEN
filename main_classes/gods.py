@@ -53,28 +53,35 @@ class Gods(BasicModel):
     @classmethod
     def get_only_types_of_gods_db(cls) -> list:
         all_types_of_gods = []
-        cur = DataBase.connect_to_db()
-        cur.execute(f"SELECT DISTINCT type_of_god From gods")
-        temp_types_of_gods_tuple = cur.fetchall()
-        for types in temp_types_of_gods_tuple:
-            for type_ in types:
-                if cls.check_for_emptiness_or_only_spaces(type_) is False:
-                    all_types_of_gods.append(type_)
-                else:
-                    print(f"Тип: '{type_}' не добавляется в список аттов")
-        return list(sorted(all_types_of_gods))
+        try:
+            cur = DataBase.connect_to_db()
+            cur.execute(f"SELECT DISTINCT type_of_god From gods")
+            temp_types_of_gods_tuple = cur.fetchall()
+            for types in temp_types_of_gods_tuple:
+                for type_ in types:
+                    if cls.check_for_emptiness_or_only_spaces(type_) is False:
+                        all_types_of_gods.append(type_)
+                    else:
+                        print(f"Тип: '{type_}' не добавляется в список аттов")
+            return list(sorted(all_types_of_gods))
+
+        except sqlite3.OperationalError as sql:
+            print(sql)
 
     @classmethod
     def get_gods_from_db(cls, type_of_god) -> list:
         names_of_gods = []
-        cur = DataBase.connect_to_db()
-        cur.execute(f"SELECT name from gods WHERE type_of_god = '{type_of_god}'")
-        temp_gods_tuple = cur.fetchall()
-        for gods in temp_gods_tuple:
-            for god in gods:
-                names_of_gods.append(god)
+        try:
+            cur = DataBase.connect_to_db()
+            cur.execute(f"SELECT name from gods WHERE type_of_god = '{type_of_god}'")
+            temp_gods_tuple = cur.fetchall()
+            for gods in temp_gods_tuple:
+                for god in gods:
+                    names_of_gods.append(god)
+            return names_of_gods
 
-        return names_of_gods
+        except sqlite3.OperationalError as sql:
+            print(sql)
 
     @classmethod
     def get_god_from_db(cls, gods_name) -> 'Gods':
